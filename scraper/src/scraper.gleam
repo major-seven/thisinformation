@@ -66,7 +66,20 @@ fn get_article(title: String, date: String) -> Result(String, Nil) {
   })
 
   case res {
-    Ok(Ok(jasper.String(x))) -> Ok(x)
+    Ok(Ok(jasper.String(x))) -> {
+      let no_newlines = x
+      |> string.to_graphemes
+      |> list.filter(fn(x) { x != "\n" })
+      |> list.map(fn(x) {
+          case x {
+            "\"" -> "'"
+            y -> y
+          }
+        })
+      |> string.join("")
+
+      Ok(no_newlines)
+    }
     _ -> Error(Nil)
   }
 }
@@ -120,15 +133,6 @@ fn get_new_title(text: String) -> Result(String, Nil) {
 }
 
 pub fn main() {
-  let json = [#("title", jasper.String("hello")), #("text", jasper.String("world"))]
-  |> dict.from_list
-  let json_string = Object(json)
-  |> jasper.stringify_json
-
-  let res = shellout.command(run: "curl", with: ["http://localhost:3000/api/new-article/123", "-d", json_string, "-s", "-X", "POST"], in: ".", opt: [])
-  |> io.debug
-  panic as "end"
-
   let rss = "sources.txt"
   |> simplifile.read
   |> result.unwrap("")
@@ -168,15 +172,15 @@ pub fn main() {
         |> list.filter(fn(x) { x != "\\" && x != "\"" && x != "\n"})
         |> string.join("")
 
-        let json = [#("title", jasper.String(title)), #("text", jasper.String(text))]
+        let json = [#("title", jasper.String(title)), #("content", jasper.String(text))]
         |> dict.from_list
         let json_string = Object(json)
         |> jasper.stringify_json
 
-        let res = shellout.command(run: "curl", with: ["http://localhost:3000/api/new-article/123", "-d", json_string, "-s", "-X", "POST"], in: ".", opt: [])
+        shellout.command(run: "curl", with: ["http://localhost:3000/api/new-article/123", "-s", "-X", "POST", "-d", json_string, "-H", "Content-Type: application/json"], in: ".", opt: [])
         |> io.debug
 
-        simplifile.write("../articles/" <> title <> ".txt", text)
+        //simplifile.write("../articles/" <> title <> ".txt", text)
       })
     })
 }
