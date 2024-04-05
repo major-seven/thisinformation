@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"github.com/mmcdole/gofeed"
 )
 
@@ -35,7 +36,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(titles)
+	titles_filtered := filter_titles(titles)
+	for _, t := range titles_filtered {
+		fmt.Println(t)
+	}
 }
 
 func fetch_titles_from_rss_urls(urls []string) ([]string, error) {
@@ -55,7 +59,13 @@ func fetch_titles_from_rss_urls(urls []string) ([]string, error) {
 }
 
 func filter_titles(all []string) []string {
-	return nil
+	result := make([]string, 0)
+	for i := 0; i < len(all); i++ {
+		if !strings.Contains(all[i], "NOVA") {
+			result = append(result, all[i])
+		}
+	}
+	return result
 }
 
 func create_article_from_original_title(title *string) string {
