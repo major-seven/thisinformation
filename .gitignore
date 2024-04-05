@@ -1,3 +1,4 @@
 scraper/urls.txt
 scraper/build
 files
+.DS_Store
