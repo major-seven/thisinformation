@@ -26,7 +26,6 @@ fn parse(xml: String) -> List(String) {
   |> list.drop(1)
   |> list.map(parse_item)
   |> result.values
-  |> list.filter(fn(x) { !string.contains(x, "scienceNOW") && !string.contains(x, "Watch the Program") })
 }
 
 fn get_titles(url: String) -> List(String) {
@@ -73,7 +72,7 @@ fn get_article(title: String, date: String) -> Result(String, Nil) {
 }
 
 fn get_best_titles(titles: String) -> Result(String, Nil) {
-  let json = [#("model", jasper.String("llama2")), #("prompt", jasper.String("You are the editor of a newspaper. Select the 3 best titles from this list: Do not add anything to the titles, just select them. Just give me a numbered list back without commentary." <> titles)), #("stream", Boolean(False))]
+  let json = [#("model", jasper.String("llama2")), #("prompt", jasper.String("You are the editor of a newspaper. Select the 10 best titles from this list: Do not add anything to the titles, just select them. Just give me a numbered list back without commentary." <> titles)), #("stream", Boolean(False))]
   |> dict.from_list
 
   let json_string = Object(json)
@@ -121,7 +120,7 @@ fn get_new_title(text: String) -> Result(String, Nil) {
 }
 
 pub fn main() {
-  let rss = "urls.txt"
+  let rss = "sources.txt"
   |> simplifile.read
   |> result.unwrap("")
   |> string.split("\n")
@@ -146,6 +145,8 @@ pub fn main() {
       |> string.join("")
     })
 
+  let best_choice = list.split(best_choice, 10).0
+
   let date = get_date()
 
   best_choice
@@ -158,7 +159,7 @@ pub fn main() {
         |> list.filter(fn(x) { x != "\\" && x != "\"" && x != "\n"})
         |> string.join("")
 
-        simplifile.write("articles/" <> title <> ".txt", text)
+        simplifile.write("../articles/" <> title <> ".txt", text)
       })
     })
 }
