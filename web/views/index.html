@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thisinformation</title>
+    <script src="https://cdn.twind.style" crossorigin></script>
+  </head>
+
+  <body>
+    <h1>Hello world</h1>
+    <div class="flex flex-wrap gap-4">
+      {{ range .Articles }}
+        {{ template "article" . }}
+      {{ end }}
+    </div>
+  </body>
+</html>

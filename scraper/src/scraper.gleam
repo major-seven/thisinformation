@@ -120,6 +120,15 @@ fn get_new_title(text: String) -> Result(String, Nil) {
 }
 
 pub fn main() {
+  let json = [#("title", jasper.String("hello")), #("text", jasper.String("world"))]
+  |> dict.from_list
+  let json_string = Object(json)
+  |> jasper.stringify_json
+
+  let res = shellout.command(run: "curl", with: ["http://localhost:3000/api/new-article/123", "-d", json_string, "-s", "-X", "POST"], in: ".", opt: [])
+  |> io.debug
+  panic as "end"
+
   let rss = "sources.txt"
   |> simplifile.read
   |> result.unwrap("")
@@ -158,6 +167,14 @@ pub fn main() {
         |> string.to_graphemes
         |> list.filter(fn(x) { x != "\\" && x != "\"" && x != "\n"})
         |> string.join("")
+
+        let json = [#("title", jasper.String(title)), #("text", jasper.String(text))]
+        |> dict.from_list
+        let json_string = Object(json)
+        |> jasper.stringify_json
+
+        let res = shellout.command(run: "curl", with: ["http://localhost:3000/api/new-article/123", "-d", json_string, "-s", "-X", "POST"], in: ".", opt: [])
+        |> io.debug
 
         simplifile.write("../articles/" <> title <> ".txt", text)
       })
