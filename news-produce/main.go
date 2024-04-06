@@ -4,14 +4,21 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"math/rand"
 	"strings"
+	"time"
 	"github.com/mmcdole/gofeed"
 )
+
+type Config struct {
+	NumberOfArticlesTarget int
+}
 
 type ArticlePrompt struct {
 	Model string	`json:"model"`
@@ -27,6 +34,9 @@ type ArticlePromptResponse struct {
 }
 
 func main() {
+	// set config
+	config := Config{ 3 }
+
 	// read in sources
 	args := os.Args[1:]
 	if len(args) != 1 {
@@ -39,7 +49,6 @@ func main() {
 	}
 	defer file.Close()
 
-	// fetch news titles
 	urls := make([]string, 0)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -48,30 +57,23 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		panic(err)
     }
-	titles, err := fetch_titles_from_rss_urls(urls)
+
+	// fetch news titles
+	titles, err := fetchTitlesFromRssUrls(urls)
 	if err != nil {
 		panic(err)
 	}
-	titles_filtered := filter_titles(titles)
-	if false {
-		fmt.Println(titles_filtered)
+	titles = filterTitles(titles)
+	titles = selectNTitles(titles, config.NumberOfArticlesTarget)
+
+	for _, t := range titles {
+		fmt.Println(t)
+		fmt.Println(createArticleFromOriginalTitle(&t))
 	}
 	
-	prompt := ArticlePrompt{
-		Model: "reporter",
-		Prompt: "write an article for a newspaper",
-		Stream: false,
-	}
-
-	content, err := send_article_prompt(prompt)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(content)
-
 }
 
-func fetch_titles_from_rss_urls(urls []string) ([]string, error) {
+func fetchTitlesFromRssUrls(urls []string) ([]string, error) {
 	titles := make([]string, 0)
 	for u := 0; u < len(urls); u += 1 {
 		fp := gofeed.NewParser()
@@ -87,7 +89,7 @@ func fetch_titles_from_rss_urls(urls []string) ([]string, error) {
 	return titles, nil
 }
 
-func filter_titles(all []string) []string {
+func filterTitles(all []string) []string {
 	result := make([]string, 0)
 	for i := 0; i < len(all); i++ {
 		if !strings.Contains(all[i], "NOVA") {
@@ -97,16 +99,34 @@ func filter_titles(all []string) []string {
 	return result
 }
 
-func create_article_from_original_title(title *string) string {
-	return ""
+func selectNTitles(all []string, n int) []string {
+	rand.Seed(time.Now().UnixNano()) // needed for unique seed
+	rand.Shuffle(len(all), func (i, j int) { all[i], all[j] = all[j], all[i] })
+	numberOfArticles := min(n, len(all))
+	return all[:numberOfArticles]
 }
 
-func send_article_prompt(prompt ArticlePrompt) (string, error) {
-	json_data, err := json.Marshal(prompt)
+func createArticleFromOriginalTitle(title *string) string {
+	prompt := ArticlePrompt{
+		Model: "news",
+		Prompt: `
+		write an article for a newspaper based on the following title: ` + *title,
+		Stream: false,
+	}
+
+	content, err := sendArticlePrompt(prompt)
+	if err != nil {
+		panic(err)
+	}
+	return content
+}
+
+func sendArticlePrompt(prompt ArticlePrompt) (string, error) {
+	jsonData, err := json.Marshal(prompt)
 	req, err := http.NewRequest(
 		"POST",
 		"http://localhost:11434/api/generate",
-		bytes.NewBuffer(json_data),
+		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
 		return "", err
@@ -131,5 +151,5 @@ func send_article_prompt(prompt ArticlePrompt) (string, error) {
 		article = response.Response
 		return article, nil
 	}
-	return "", nil
+	return "", errors.New("Prompt to LLM failed")
 }
