@@ -1,7 +1,7 @@
 package article
 
 type ArticleList struct {
-  Articles []*Article `json:"articles"`
+	Articles []*Article `json:"articles"`
 }
 
 type Article struct {
