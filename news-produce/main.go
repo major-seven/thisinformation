@@ -2,12 +2,29 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"github.com/mmcdole/gofeed"
 )
+
+type ArticlePrompt struct {
+	Model string	`json:"model"`
+	Prompt string	`json:"prompt"`
+	Stream bool		`json:"stream"`
+}
+
+type ArticlePromptResponse struct {
+	Model string		`json:"model"`
+	CreatedAt string	`json:"created_at"`
+	Response string		`json:"response"`
+	Done bool			`json:"done"`
+}
 
 func main() {
 	// read in sources
@@ -26,7 +43,6 @@ func main() {
 	urls := make([]string, 0)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
 		urls = append(urls, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
@@ -37,9 +53,22 @@ func main() {
 		panic(err)
 	}
 	titles_filtered := filter_titles(titles)
-	for _, t := range titles_filtered {
-		fmt.Println(t)
+	if false {
+		fmt.Println(titles_filtered)
 	}
+	
+	prompt := ArticlePrompt{
+		Model: "reporter",
+		Prompt: "write an article for a newspaper",
+		Stream: false,
+	}
+
+	content, err := send_article_prompt(prompt)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(content)
+
 }
 
 func fetch_titles_from_rss_urls(urls []string) ([]string, error) {
@@ -70,4 +99,37 @@ func filter_titles(all []string) []string {
 
 func create_article_from_original_title(title *string) string {
 	return ""
+}
+
+func send_article_prompt(prompt ArticlePrompt) (string, error) {
+	json_data, err := json.Marshal(prompt)
+	req, err := http.NewRequest(
+		"POST",
+		"http://localhost:11434/api/generate",
+		bytes.NewBuffer(json_data),
+	)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	article := ""
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var response ArticlePromptResponse
+		if err := json.Unmarshal(bodyBytes, &response); err != nil {
+			return "", err
+		}
+		article = response.Response
+		return article, nil
+	}
+	return "", nil
 }

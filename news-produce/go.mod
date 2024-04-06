@@ -1,6 +1,6 @@
-module news-produce
+module github.com/major-seven/thisinformation/news-produce
 
-go 1.21.1
+go 1.22.1
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0 // indirect
