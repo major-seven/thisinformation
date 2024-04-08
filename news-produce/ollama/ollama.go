@@ -75,62 +75,62 @@ func SelectNArticlesFromTitles(n int, titles []string) ([]string, error) {
 		return nil, err
 	}
 
-  split := strings.Split(response, "\n")
-  selected := make([]string, 0)
-  for _, line := range split {
-    _, title, found := strings.Cut(line, " ")
-    if found {
-      selected = append(selected, title)
-    }
-  }
+	split := strings.Split(response, "\n")
+	selected := make([]string, 0)
+	for _, line := range split {
+		_, title, found := strings.Cut(line, " ")
+		if found {
+			selected = append(selected, title)
+		}
+	}
 
 	return selected, nil
 }
 
 func CreateArticleFromTitle(title, model *string) (string, error) {
-  currentTime := time.Now()
-  date := currentTime.Format("2006-01-02")
+	currentTime := time.Now()
+	date := currentTime.Format("2006-01-02")
 
 	prompt := prompt{
-		Model: *model,
-    Prompt: fmt.Sprintf("%s: %s", date, *title),
+		Model:  *model,
+		Prompt: fmt.Sprintf("%s: %s", date, *title),
 		Stream: false,
 	}
 
 	content, err := prompt.sendPrompt()
 	if err != nil {
-    return "", err
+		return "", err
 	}
 
 	return content, nil
 }
 
 func CreateTitleFromArticle(article *string) (string, error) {
-  prompt := prompt{
-    Model: "llama2",
-    Prompt: fmt.Sprintf("You are a reporter for a large news paper. Write a title for the following article Only give me one title, do not give me a choice and do not add any commentary: %s", *article),
-    Stream: false,
-  }
+	prompt := prompt{
+		Model:  "llama2",
+		Prompt: fmt.Sprintf("You are a reporter for a large news paper. Write a title for the following article Only give me one title, do not give me a choice and do not add any commentary: %s", *article),
+		Stream: false,
+	}
 
-  title, err := prompt.sendPrompt()
-  if err != nil {
-    return "", err
-  }
+	title, err := prompt.sendPrompt()
+	if err != nil {
+		return "", err
+	}
 
-  return title, nil
+	return title, nil
 }
 
 func CreateAuthorFromArticle(article *string) (string, error) {
-  prompt := prompt{
-    Model: "llama2",
-    Prompt: fmt.Sprintf("Give me a name for the author of the following article of a reputable news paper. Only reply with the name, do not add anything else.: %s", *article),
-    Stream: false,
-  }
+	prompt := prompt{
+		Model:  "llama2",
+		Prompt: fmt.Sprintf("Give me a name for the author of the following article of a reputable news paper. Only reply with the name, do not add anything else.: %s", *article),
+		Stream: false,
+	}
 
-  author, err := prompt.sendPrompt()
-  if err != nil {
-    return "", err
-  }
+	author, err := prompt.sendPrompt()
+	if err != nil {
+		return "", err
+	}
 
-  return author, nil
+	return author, nil
 }
