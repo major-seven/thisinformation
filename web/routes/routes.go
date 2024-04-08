@@ -22,7 +22,7 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 
   app.GET("/archive/:date", func(c echo.Context) error {
     date := c.Param("date")
-    d, err := database.GetArticleByDate(db, date)
+    d, err := database.GetDataByDate(db, date)
     if err != nil || len(d.Articles) == 0 {
       return c.Render(http.StatusOK, "invalid-date.html", nil)
     }
@@ -49,7 +49,7 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				return c.String(http.StatusInternalServerError, "internal server error")
 			}
 
-      newData, err := database.GetTodayArticles(db)
+      newData, err := database.GetTodayData(db)
       if err != nil {
         return c.String(http.StatusInternalServerError, "internal server error")
       }
@@ -86,7 +86,7 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				}
 			}
 
-      newData, err := database.GetTodayArticles(db)
+      newData, err := database.GetTodayData(db)
       if err != nil {
         return c.String(http.StatusInternalServerError, "internal server error")
       }

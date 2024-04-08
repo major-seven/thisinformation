@@ -9,6 +9,8 @@ import (
 	"github.com/major-seven/thisinformation/web/data"
 )
 
+const startDate = "2024-04-08"
+
 func GetDB(path string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
@@ -23,8 +25,14 @@ func GetDB(path string) (*sql.DB, error) {
 	return db, nil
 }
 
+func getNumDays(a, b string) int {
+  t1, _ := time.Parse("2006-01-02", a)
+  t2, _ := time.Parse("2006-01-02", b)
+  return int(t1.Sub(t2).Hours() / 24)
+}
+
 func GetDataFromDB(db *sql.DB) (*data.Data, error) {
-  d, err := GetTodayArticles(db)
+  d, err := GetTodayData(db)
   if err != nil {
     return nil, err
   }
@@ -35,10 +43,13 @@ func GetDataFromDB(db *sql.DB) (*data.Data, error) {
   }
 
   d.Dates = dates
+  d.Today = time.Now().Format("2006-01-02")
+  d.Edition = getNumDays(d.Today, startDate) + 1
+
 	return d, nil
 }
 
-func GetArticleByDate(db *sql.DB, date string) (*data.Data, error) {
+func GetDataByDate(db *sql.DB, date string) (*data.Data, error) {
   d := data.Data{}
 
   rows, err := db.Query(fmt.Sprintf("SELECT title, content, author, date FROM articles WHERE date = '%s'", date))
@@ -56,11 +67,14 @@ func GetArticleByDate(db *sql.DB, date string) (*data.Data, error) {
     d.Articles = append(d.Articles, a)
   }
 
+  d.Today = date
+  d.Edition = getNumDays(date, startDate) + 1
+
   return &d, nil
 }
 
-func GetTodayArticles(db *sql.DB) (*data.Data, error) {
-  return GetArticleByDate(db, time.Now().Format("2006-01-02"))
+func GetTodayData(db *sql.DB) (*data.Data, error) {
+  return GetDataByDate(db, time.Now().Format("2006-01-02"))
 }
 
 func GetAllDates(db *sql.DB) ([]string, error) {
