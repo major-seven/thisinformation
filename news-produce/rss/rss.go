@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/mmcdole/gofeed"
 )
