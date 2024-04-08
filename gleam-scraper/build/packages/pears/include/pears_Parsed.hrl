@@ -1,1 +1,0 @@
--record(parsed, {input :: pears@input:input(any()), value :: any()}).

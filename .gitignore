@@ -1,5 +1,5 @@
 scraper/urls.txt
-scraper/build
+gleam-scraper/build
 files
 .DS_Store
 *.db

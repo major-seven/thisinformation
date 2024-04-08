@@ -1,1 +1,0 @@
--record(input, {tokens :: list(any()), cursor :: integer()}).

@@ -1,8 +1,0 @@
-[packages]
-simplifile = "1.6.1"
-jasper = "1.2.0"
-pears = "0.3.0"
-gleam_stdlib = "0.36.0"
-shellout = "1.6.0"
-gleeunit = "1.1.2"
-filepath = "1.0.0"
