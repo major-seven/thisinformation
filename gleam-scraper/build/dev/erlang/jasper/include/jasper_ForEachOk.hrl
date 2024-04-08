@@ -1,0 +1,1 @@
+-record(for_each_ok, {'query' :: jasper:json_query()}).

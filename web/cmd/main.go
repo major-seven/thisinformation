@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -45,12 +46,12 @@ func main() {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS articles (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, author TEXT)")
 	if err != nil {
 		panic(err)
 	}
 
-	rows, err := db.Query("SELECT title, content FROM articles")
+	rows, err := db.Query("SELECT title, content, author FROM articles")
 	if err != nil {
 		panic(err)
 	}
@@ -78,15 +79,18 @@ func main() {
 		if c.Param("key") == KEY {
 			a := new(article.Article)
 			if err := c.Bind(a); err != nil {
+        fmt.Println(err)
 				return c.String(http.StatusBadRequest, "bad request")
 			}
 
 			if a.Title == "" || a.Content == "" {
+        fmt.Println("Title or content is empty")
 				return c.String(http.StatusBadRequest, "bad request")
 			}
 
-			_, err := db.Exec("INSERT INTO articles (title, content) VALUES (?, ?)", a.Title, a.Content)
+			_, err := db.Exec("INSERT INTO articles (title, content, author) VALUES (?, ?, ?)", a.Title, a.Content, a.Author)
 			if err != nil {
+        fmt.Println(err)
 				return c.String(http.StatusInternalServerError, "internal server error")
 			}
 
@@ -94,6 +98,7 @@ func main() {
 			return c.String(http.StatusOK, "ok")
 
 		} else {
+      fmt.Println("Unauthorized")
 			return c.String(http.StatusUnauthorized, "unauthorized")
 		}
 	})

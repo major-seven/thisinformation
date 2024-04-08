@@ -1,0 +1,1 @@
+-record(index, {'query' :: jasper:json_query(), index :: integer()}).

@@ -1,0 +1,1 @@
+-record(key, {'query' :: jasper:json_query(), key :: binary()}).

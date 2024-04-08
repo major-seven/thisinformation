@@ -3,3 +3,4 @@ scraper/build
 files
 .DS_Store
 *.db
+sources.txt

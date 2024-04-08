@@ -1,0 +1,11 @@
+{application, pears, [
+    {vsn, "0.3.0"},
+    {applications, [gleam_stdlib,
+                    gleeunit]},
+    {description, "A parser combinator library for Gleam"},
+    {modules, [pears,
+               pears@chars,
+               pears@combinators,
+               pears@input]},
+    {registered, []}
+]}.
