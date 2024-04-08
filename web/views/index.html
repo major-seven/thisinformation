@@ -11,9 +11,7 @@
   </head>
 
   <body style="font-family: 'Newsreader', serif;" class="text-neutral-900 bg-neutral-50">
-    <div class="h-[100px] border-b-2 w-4/5 mx-auto mb-8 flex items-center">
-      <h1 class="text-[40px] font-bold w-full text-center mb-2">Thisinformation</h1>
-    </div>
+    {{ template "header" . }}
     <div class="grid grid-cols-3 w-3/4 mx-auto">
       {{ range .Articles }}
         {{ template "article" . }}

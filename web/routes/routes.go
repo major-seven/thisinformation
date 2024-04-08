@@ -8,12 +8,27 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/major-seven/thisinformation/web/article"
 	"github.com/major-seven/thisinformation/web/data"
+	"github.com/major-seven/thisinformation/web/database"
 )
 
 func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 	app.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", data)
 	})
+
+	app.GET("/archive", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "archive.html", data)
+	})
+
+  app.GET("/archive/:date", func(c echo.Context) error {
+    date := c.Param("date")
+    d, err := database.GetArticleByDate(db, date)
+    if err != nil || len(d.Articles) == 0 {
+      return c.Render(http.StatusOK, "invalid-date.html", nil)
+    }
+
+    return c.Render(http.StatusOK, "index.html", d)
+  })
 
 	app.POST("/api/new-article/:key", func(c echo.Context) error {
 		if c.Param("key") == newsKey {
@@ -34,7 +49,12 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				return c.String(http.StatusInternalServerError, "internal server error")
 			}
 
-			data.Articles = append(data.Articles, a)
+      newData, err := database.GetTodayArticles(db)
+      if err != nil {
+        return c.String(http.StatusInternalServerError, "internal server error")
+      }
+
+      data = newData
 			return c.String(http.StatusOK, "ok")
 
 		} else {
@@ -66,7 +86,12 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				}
 			}
 
-			data.Articles = append(data.Articles, articles.Articles...)
+      newData, err := database.GetTodayArticles(db)
+      if err != nil {
+        return c.String(http.StatusInternalServerError, "internal server error")
+      }
+      data = newData
+
 			return c.String(http.StatusOK, "ok")
 
 		} else {
