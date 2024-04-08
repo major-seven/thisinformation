@@ -7,5 +7,6 @@ type ArticleList struct {
 type Article struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
-  Author  string `json:"author"`
+	Author  string `json:"author"`
+	Date    string `json:"date"`
 }

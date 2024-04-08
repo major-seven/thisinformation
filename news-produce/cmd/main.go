@@ -36,7 +36,7 @@ func main() {
 	flag.StringVar(&ModelName, "model", "news", "Model to use for generation")
 	flag.StringVar(&SourcesFile, "src", "sources.txt", "File containing list of RSS sources")
 	flag.BoolVar(&Verbose, "v", false, "Verbose output")
-	flag.StringVar(&ServerKey, "key", "", "Server key for API, if not set will use NEWS_KEY env var")
+	flag.StringVar(&ServerKey, "key", ServerKey, "Server key for API, if not set will use NEWS_KEY env var")
 	flag.Parse()
 
 	config := Config{

@@ -12,6 +12,7 @@ type Article struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	Author  string `json:"author"`
+	Date    string `json:"date"`
 }
 
 func (a *Article) TrimTitle() {
@@ -27,6 +28,12 @@ func (a *Article) TrimTitle() {
 			a.Title = strings.TrimPrefix(a.Title, "'")
 			a.Title = strings.TrimSuffix(a.Title, "'")
 		}
+
+    if strings.HasPrefix(a.Title, "Title:") {
+      a.Title = strings.TrimPrefix(a.Title, "Title:")
+    }
+
+    a.Title = strings.TrimSpace(a.Title)
 	}
 }
 
@@ -41,6 +48,8 @@ func (a *Article) TrimAuthor() {
 		if strings.Contains(a.Author, "By") {
 			a.Author = strings.Split(a.Author, "By")[1]
 		}
+
+    a.Author = strings.TrimSpace(a.Author)
 	}
 }
 
