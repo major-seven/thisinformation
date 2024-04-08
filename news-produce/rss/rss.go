@@ -52,12 +52,35 @@ func filterTitles(titles []string) []string {
 	result := make([]string, 0)
 
 	for _, title := range titles {
+    lowerTitle := strings.ToLower(title)
+
 		if strings.Contains(title, "NOVA") {
 			continue
 		}
-		if strings.Contains(title, "Watch the program") {
+		if strings.Contains(lowerTitle, "watch the program") {
 			continue
 		}
+    if strings.Contains(lowerTitle, "guardian") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "the guardian") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "cnn") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "nytimes") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "new york times") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "ny times") {
+      continue
+    }
+    if strings.Contains(lowerTitle, "pbs") {
+      continue
+    }
 		result = append(result, title)
 	}
 
@@ -65,7 +88,6 @@ func filterTitles(titles []string) []string {
 }
 
 func SelectNRandom(all []string, n int) []string {
-	rand.Seed(time.Now().UnixNano()) // needed for unique seed
 	rand.Shuffle(len(all), func(i, j int) { all[i], all[j] = all[j], all[i] })
 	numberOfArticles := min(n, len(all))
 	return all[:numberOfArticles]

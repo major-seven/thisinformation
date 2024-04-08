@@ -39,8 +39,6 @@ func (a *Article) TrimTitle() {
 
 func (a *Article) TrimAuthor() {
 	if a.Author != "" {
-		a.Author = strings.TrimSpace(a.Author)
-
 		if strings.Contains(a.Author, "by") {
 			a.Author = strings.Split(a.Author, "by")[1]
 		}
@@ -48,6 +46,10 @@ func (a *Article) TrimAuthor() {
 		if strings.Contains(a.Author, "By") {
 			a.Author = strings.Split(a.Author, "By")[1]
 		}
+
+    if strings.Contains(a.Author, ":") {
+      a.Author = strings.Split(a.Author, ":")[1]
+    }
 
     a.Author = strings.TrimSpace(a.Author)
 	}
