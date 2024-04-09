@@ -20,15 +20,15 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 		return c.Render(http.StatusOK, "archive.html", data)
 	})
 
-  app.GET("/archive/:date", func(c echo.Context) error {
-    date := c.Param("date")
-    d, err := database.GetDataByDate(db, date)
-    if err != nil || len(d.Articles) == 0 {
-      return c.Render(http.StatusOK, "invalid-date.html", nil)
-    }
+	app.GET("/archive/:date", func(c echo.Context) error {
+		date := c.Param("date")
+		d, err := database.GetDataByDate(db, date)
+		if err != nil || len(d.Articles) == 0 {
+			return c.Render(http.StatusOK, "invalid-date.html", nil)
+		}
 
-    return c.Render(http.StatusOK, "index.html", d)
-  })
+		return c.Render(http.StatusOK, "index.html", d)
+	})
 
 	app.POST("/api/new-article/:key", func(c echo.Context) error {
 		if c.Param("key") == newsKey {
@@ -41,20 +41,20 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				return c.String(http.StatusBadRequest, "bad request")
 			}
 
-      time := time.Now()
-      a.Date = time.Format("2006-01-02")
+			time := time.Now()
+			a.Date = time.Format("2006-01-02")
 
 			_, err := db.Exec("INSERT INTO articles (title, content, author, date) VALUES (?, ?, ?, ?)", a.Title, a.Content, a.Author, a.Date)
 			if err != nil {
 				return c.String(http.StatusInternalServerError, "internal server error")
 			}
 
-      newData, err := database.GetTodayData(db)
-      if err != nil {
-        return c.String(http.StatusInternalServerError, "internal server error")
-      }
+			newData, err := database.GetTodayData(db)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, "internal server error")
+			}
 
-      data = newData
+			data = newData
 			return c.String(http.StatusOK, "ok")
 
 		} else {
@@ -86,11 +86,11 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 				}
 			}
 
-      newData, err := database.GetTodayData(db)
-      if err != nil {
-        return c.String(http.StatusInternalServerError, "internal server error")
-      }
-      data = newData
+			newData, err := database.GetTodayData(db)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, "internal server error")
+			}
+			data = newData
 
 			return c.String(http.StatusOK, "ok")
 

@@ -29,11 +29,11 @@ func (a *Article) TrimTitle() {
 			a.Title = strings.TrimSuffix(a.Title, "'")
 		}
 
-    if strings.HasPrefix(a.Title, "Title:") {
-      a.Title = strings.TrimPrefix(a.Title, "Title:")
-    }
+		if strings.HasPrefix(a.Title, "Title:") {
+			a.Title = strings.TrimPrefix(a.Title, "Title:")
+		}
 
-    a.Title = strings.TrimSpace(a.Title)
+		a.Title = strings.TrimSpace(a.Title)
 	}
 }
 
@@ -47,11 +47,22 @@ func (a *Article) TrimAuthor() {
 			a.Author = strings.Split(a.Author, "By")[1]
 		}
 
-    if strings.Contains(a.Author, ":") {
-      a.Author = strings.Split(a.Author, ":")[1]
-    }
+		if strings.Contains(a.Author, ":") {
+			a.Author = strings.Split(a.Author, ":")[1]
+		}
 
-    a.Author = strings.TrimSpace(a.Author)
+		if strings.Contains(strings.ToLower(a.Author), "sure") {
+			split := strings.Split(a.Author, " ")
+			if len(split) > 2 {
+				a.Author = strings.Join(split[len(split)-2:], " ")
+			}
+		}
+
+		if strings.HasSuffix(a.Author, ".") {
+			a.Author = strings.TrimSuffix(a.Author, ".")
+		}
+
+		a.Author = strings.TrimSpace(a.Author)
 	}
 }
 

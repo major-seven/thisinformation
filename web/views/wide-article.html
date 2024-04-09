@@ -1,0 +1,8 @@
+{{ block "wide-article" . }}
+<div class="px-4 border-b-2 mb-12 pb-8 row-auto col-span-3 md:col-span-2">
+  <h1 class="text-lg font-semibold">{{ .Title }}</h1>
+  <div class="w-full mb-1 mt-2 h-[1px]"></div>
+  <p>{{ .Content }}</p>
+  <p class="mt-2 italic">By {{ .Author }}</p>
+</div>
+{{ end }}

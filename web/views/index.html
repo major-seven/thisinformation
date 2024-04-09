@@ -13,8 +13,74 @@
   <body style="font-family: 'Newsreader', serif;" class="text-neutral-900 bg-neutral-50 w-screen overflow-x-hidden">
     {{ template "header" . }}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-3/4 mx-auto">
-      {{ range .Articles }}
-        {{ template "article" . }}
+      {{ if .CoverStory }}
+        {{ template "cover-story" . }}
+      {{ end }}
+
+      {{ with (nth .Articles 0) }}
+        {{ if . }}
+          {{ template "article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ if .Crossword }}
+        {{ template "crossword" .Crossword }}
+      {{ end }}
+
+      {{ with (nth .Articles 1) }}
+        {{ if . }}
+          {{ template "wide-article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ with (nth .Articles 2) }}
+        {{ if . }}
+          {{ template "article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ with (nth .Articles 3) }}
+        {{ if . }}
+          {{ template "article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ with (nth .Articles 4) }}
+        {{ if . }}
+          {{ template "article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ with (nth .Articles 5) }}
+        {{ if . }}
+          {{ template "article" . }}
+        {{ end }}
+      {{ end }}
+
+      <div class="flex flex-col col-span-2">
+        {{ with (nth .Articles 6) }}
+          {{ if . }}
+            {{ template "wide-article" . }}
+          {{ end }}
+        {{ end }}
+
+        {{ with (nth .Articles 7) }}
+          {{ if . }}
+            {{ template "wide-article" . }}
+          {{ end }}
+        {{ end }}
+      </div>
+
+      {{ with (nth .Articles 7) }}
+        {{ if . }}
+          {{ template "full-article" . }}
+        {{ end }}
+      {{ end }}
+
+      {{ range $i, $a := .Articles }}
+        {{ if gt $i 8 }}
+          {{ template "article" $a }}
+        {{ end }}
       {{ end }}
     </div>
   </body>

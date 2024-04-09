@@ -51,7 +51,7 @@ func filterTitles(titles []string) []string {
 	result := make([]string, 0)
 
 	for _, title := range titles {
-    lowerTitle := strings.ToLower(title)
+		lowerTitle := strings.ToLower(title)
 
 		if strings.Contains(title, "NOVA") {
 			continue
@@ -59,27 +59,27 @@ func filterTitles(titles []string) []string {
 		if strings.Contains(lowerTitle, "watch the program") {
 			continue
 		}
-    if strings.Contains(lowerTitle, "guardian") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "the guardian") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "cnn") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "nytimes") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "new york times") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "ny times") {
-      continue
-    }
-    if strings.Contains(lowerTitle, "pbs") {
-      continue
-    }
+		if strings.Contains(lowerTitle, "guardian") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "the guardian") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "cnn") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "nytimes") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "new york times") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "ny times") {
+			continue
+		}
+		if strings.Contains(lowerTitle, "pbs") {
+			continue
+		}
 		result = append(result, title)
 	}
 

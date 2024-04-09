@@ -1,6 +1,5 @@
-scraper/urls.txt
-gleam-scraper/build
-files
 .DS_Store
-*.db
 sources.txt
+tmp
+*.jpg
+*.db

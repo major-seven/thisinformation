@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/major-seven/thisinformation/news-produce/article"
+	"github.com/major-seven/thisinformation/news-produce/dalle"
 	"github.com/major-seven/thisinformation/news-produce/ollama"
 	"github.com/major-seven/thisinformation/news-produce/rss"
 )
@@ -17,6 +18,10 @@ type Config struct {
 	ModelName              string
 	SourcesFile            string
 	ServerKey              string
+	CreateImage            bool
+	ImagePath              string
+	CreatePuzzle           bool
+	PuzzlePath             string
 }
 
 func main() {
@@ -27,6 +32,10 @@ func main() {
 		SourcesFile            string
 		Verbose                bool
 		ServerKey              string
+		CreateImage            bool
+		ImagePath              string
+		CreatePuzzle           bool
+		PuzzlePath             string
 	)
 
 	ServerKey = os.Getenv("NEWS_KEY")
@@ -37,6 +46,10 @@ func main() {
 	flag.StringVar(&SourcesFile, "src", "sources.txt", "File containing list of RSS sources")
 	flag.BoolVar(&Verbose, "v", false, "Verbose output")
 	flag.StringVar(&ServerKey, "key", ServerKey, "Server key for API, if not set will use NEWS_KEY env var")
+	flag.BoolVar(&CreateImage, "img", false, "Create image for first title")
+	flag.StringVar(&ImagePath, "imgpath", "", "Path to save image")
+	flag.BoolVar(&CreatePuzzle, "puz", false, "Create daily puzzle")
+	flag.StringVar(&PuzzlePath, "puzpath", "", "Path to save puzzle")
 	flag.Parse()
 
 	config := Config{
@@ -45,6 +58,9 @@ func main() {
 		ModelName:              ModelName,
 		SourcesFile:            SourcesFile,
 		ServerKey:              ServerKey,
+		CreateImage:            CreateImage,
+		CreatePuzzle:           CreatePuzzle,
+		PuzzlePath:             PuzzlePath,
 	}
 
 	fmt.Printf("Generating %d articles using model %s from sources in %s\n", config.NumberOfArticlesTarget, config.ModelName, config.SourcesFile)
@@ -54,7 +70,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("\nFound %d sources:\n", len(urls))
+	fmt.Printf("Found %d sources:\n", len(urls))
 	for i, url := range urls {
 		fmt.Printf("%d: %s\n", i+1, url)
 	}
@@ -64,14 +80,14 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("\nFound %d titles\n", len(titles))
+	fmt.Printf("Found %d titles\n", len(titles))
 	if Verbose {
 		for i, title := range titles {
 			fmt.Printf("%d: %s\n", i+1, title)
 		}
 	}
 
-	fmt.Printf("\nSelecting %d random titles for model to consider...\n", config.SubselectionSize)
+	fmt.Printf("Selecting %d random titles for model to consider...\n", config.SubselectionSize)
 	titles = rss.SelectNRandom(titles, config.SubselectionSize)
 	if Verbose {
 		for i, title := range titles {
@@ -79,20 +95,40 @@ func main() {
 		}
 	}
 
-	fmt.Printf("\nLetting model select %d titles...\n", config.NumberOfArticlesTarget)
+	fmt.Printf("Letting model select %d titles...\n", config.NumberOfArticlesTarget)
 	selectedTitles, err := ollama.SelectNArticlesFromTitles(config.NumberOfArticlesTarget, titles)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("\nModel selected %d titles\n", len(selectedTitles))
+	fmt.Printf("Model selected %d titles\n", len(selectedTitles))
 	if Verbose {
 		for i, title := range selectedTitles {
 			fmt.Printf("%d: %s\n", i+1, title)
 		}
 	}
 
-	fmt.Printf("\nGenerating articles...\n")
+	if config.CreateImage {
+		fmt.Printf("Creating image for '%s'...\n", selectedTitles[0])
+		prompt, err := ollama.CreateImagePromptFromTitle(selectedTitles[0])
+		if err != nil {
+			panic(err)
+		}
+
+		if Verbose {
+			fmt.Printf("Prompt: %s\n", prompt)
+		}
+
+		url, err := dalle.CreateImageForPrompt(prompt)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("Saving image to %s\n", ImagePath)
+		dalle.DownloadImage(url, ImagePath)
+	}
+
+	fmt.Printf("Generating articles...\n")
 	numArticles := 0
 	for _, title := range selectedTitles {
 		article := article.Article{}
@@ -154,4 +190,26 @@ func main() {
 	}
 
 	fmt.Printf("\nGenerated %d articles\n", numArticles)
+
+	if config.CreatePuzzle {
+		fmt.Printf("Creating daily puzzle...\n")
+		url, err := dalle.GenerateDailyPuzzle()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Saving daily puzzle to %s...\n", config.PuzzlePath)
+		dalle.DownloadImage(url, config.PuzzlePath)
+
+		fmt.Printf("Creating puzzle hint...\n")
+		hints, err := ollama.CreateCrosswordHints()
+		if err != nil {
+			panic(err)
+		}
+		puzzleArticle := article.Article{
+			Title:   "CROSSWORD",
+			Content: hints,
+			Author:  "CROSSWORD",
+		}
+		puzzleArticle.AddToServer(config.ServerKey)
+	}
 }

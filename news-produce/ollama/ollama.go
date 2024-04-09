@@ -134,3 +134,37 @@ func CreateAuthorFromArticle(article *string) (string, error) {
 
 	return author, nil
 }
+
+func CreateImagePromptFromTitle(title string) (string, error) {
+	prompt := prompt{
+		Model:  "llama2",
+		Prompt: "Create a prompt for an image creation engine to generate a suiting image for the following headline, it should be a grainy black and whity photograph, the prompt should be less than 700 characters: " + title,
+		Stream: false,
+	}
+
+	imagePrompt, err := prompt.sendPrompt()
+	if err != nil {
+		return "", err
+	}
+
+	return imagePrompt, nil
+}
+
+func CreateCrosswordHints() (string, error) {
+	prompt := prompt{
+		Model:  "llama2",
+		Prompt: "Give me a list of 10 crossword hints for words. Do not add any comment, just write the list.",
+		Stream: false,
+	}
+
+	hints, err := prompt.sendPrompt()
+	if err != nil {
+		return "", err
+	}
+
+	if strings.Contains(hints, "1.") {
+		hints = "1." + strings.Split(hints, "1.")[1]
+	}
+
+	return hints, nil
+}

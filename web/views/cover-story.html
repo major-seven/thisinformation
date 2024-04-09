@@ -1,0 +1,14 @@
+{{ block "cover-story" . }}
+<div class="px-4 border-b-2 mb-12 pb-8 row-auto pr-6 col-span-3 md:col-span-2">
+  <h1 class="text-2xl font-semibold">{{ .CoverStory.Title }}</h1>
+  <div class="pt-4">
+    <img
+      src="/static/photos/{{ .Today }}.jpg"
+      alt="Cover story image"
+      class="w-[300px] h-[300px] xl:w-[400px] xl:h-[400px] mt-2 ml-6 mr-4 mb-4 float-right"
+    />
+    <p>{{ .CoverStory.Content }}</p>
+    <p class="mt-2 italic">By {{ .CoverStory.Author }}</p>
+  </div>
+</div>
+{{ end }}
