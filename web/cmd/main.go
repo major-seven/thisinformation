@@ -38,14 +38,17 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 type Config struct {
 	DbPath  string
 	NewsKey string
+	Port    string
 }
 
 func main() {
 	newsKey := os.Getenv("NEWS_KEY")
 	var dbPath string
+  var port string
 
 	flag.StringVar(&newsKey, "news-key", newsKey, "News API key")
 	flag.StringVar(&dbPath, "db-path", "./news.db", "Path to the database file")
+  flag.StringVar(&port, "port", "3000", "Port to run the server on")
 	flag.Parse()
 
 	if newsKey == "" {
@@ -73,5 +76,5 @@ func main() {
 	app.Use(middleware.Logger())
 	app.Static("/static", "static")
 	routes.AddRoutes(app, data, db, config.NewsKey)
-	app.Logger.Fatal(app.Start(":3000"))
+	app.Logger.Fatal(app.Start(":"+port))
 }
