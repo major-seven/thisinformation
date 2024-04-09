@@ -67,6 +67,12 @@ func GetDataByDate(db *sql.DB, date string) (*data.Data, error) {
     d.Articles = append(d.Articles, a)
   }
 
+  dates, err := GetAllDates(db)
+  if err != nil {
+    return nil, err
+  }
+
+  d.Dates = dates
   d.Today = date
   d.Edition = getNumDays(date, startDate) + 1
 
