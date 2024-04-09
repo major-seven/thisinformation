@@ -10,7 +10,7 @@ import (
 	"github.com/major-seven/thisinformation/web/data"
 )
 
-const startDate = "2024-04-08"
+const startDate = "2024-04-09"
 
 func GetDB(path string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", path)
