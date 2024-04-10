@@ -66,14 +66,14 @@ func (a *Article) TrimAuthor() {
 	}
 }
 
-func (a *Article) AddToServer(key string) error {
+func (a *Article) AddToServer(key, serverUrl string) error {
 	jsonData, err := json.Marshal(a)
 	if err != nil {
 		return err
 	}
 
 	resp, err := http.Post(
-		"http://localhost:3000/api/new-article/"+key,
+		serverUrl+"/api/new-article/"+key,
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)

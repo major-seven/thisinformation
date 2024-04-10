@@ -18,6 +18,7 @@ type Config struct {
 	ModelName              string
 	SourcesFile            string
 	ServerKey              string
+	ServerUrl              string
 	CreateImage            bool
 	ImagePath              string
 	CreatePuzzle           bool
@@ -32,6 +33,7 @@ func main() {
 		SourcesFile            string
 		Verbose                bool
 		ServerKey              string
+		ServerUrl              string
 		CreateImage            bool
 		ImagePath              string
 		CreatePuzzle           bool
@@ -50,6 +52,7 @@ func main() {
 	flag.StringVar(&ImagePath, "imgpath", "", "Path to save image")
 	flag.BoolVar(&CreatePuzzle, "puz", false, "Create daily puzzle")
 	flag.StringVar(&PuzzlePath, "puzpath", "", "Path to save puzzle")
+	flag.StringVar(&ServerUrl, "url", "http://localhost:3000", "Server URL")
 	flag.Parse()
 
 	config := Config{
@@ -58,6 +61,7 @@ func main() {
 		ModelName:              ModelName,
 		SourcesFile:            SourcesFile,
 		ServerKey:              ServerKey,
+		ServerUrl:              ServerUrl,
 		CreateImage:            CreateImage,
 		CreatePuzzle:           CreatePuzzle,
 		PuzzlePath:             PuzzlePath,
@@ -180,7 +184,7 @@ func main() {
 		fmt.Printf("\nGenerated article: %s\n", article.Title)
 
 		fmt.Printf("Adding article to server...\n")
-		err = article.AddToServer(config.ServerKey)
+		err = article.AddToServer(config.ServerKey, config.ServerUrl)
 		if err != nil {
 			fmt.Printf("Error adding article to server: %s\n", err)
 			continue
@@ -210,6 +214,6 @@ func main() {
 			Content: hints,
 			Author:  "CROSSWORD",
 		}
-		puzzleArticle.AddToServer(config.ServerKey)
+		puzzleArticle.AddToServer(config.ServerKey, config.ServerUrl)
 	}
 }
