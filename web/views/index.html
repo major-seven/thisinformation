@@ -75,14 +75,8 @@
         {{ end }}
       </div>
 
-      {{ with (nth .Articles 7) }}
-        {{ if . }}
-          {{ template "full-article" . }}
-        {{ end }}
-      {{ end }}
-
       {{ range $i, $a := .Articles }}
-        {{ if gt $i 8 }}
+        {{ if gt $i 7 }}
           {{ template "article" $a }}
         {{ end }}
       {{ end }}
