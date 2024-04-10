@@ -98,7 +98,7 @@ func DownloadImage(url string, path string) error {
 	}
 	defer resp.Body.Close()
 
-	file_name := filepath.Join(path, today.Format("2006-01-02")+".jpg")
+	file_name := filepath.Join(path, today.Format("2006-01-02")+".png")
 	file, err := os.Create(file_name)
 	if err != nil {
 		return err
