@@ -73,7 +73,7 @@ func (a *Article) AddToServer(key, serverUrl string) error {
 	}
 
 	resp, err := http.Post(
-		serverUrl+"/api/new-article/"+key,
+    serverUrl+"/api/new-article/"+key,
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
