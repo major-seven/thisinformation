@@ -3,4 +3,5 @@ sources.txt
 tmp
 *.jpg
 *.db
-bin/*
+news-produce/bin/*
+news-web/bin/*
