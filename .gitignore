@@ -3,3 +3,4 @@ sources.txt
 tmp
 *.jpg
 *.db
+bin/*
