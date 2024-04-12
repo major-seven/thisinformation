@@ -4,4 +4,6 @@ tmp
 *.jpg
 *.db
 news-produce/bin/*
+!news-produce/bin/.gitkeep
 news-web/bin/*
+!news-web/bin/.gitkeep
