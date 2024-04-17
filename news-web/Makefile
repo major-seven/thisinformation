@@ -3,3 +3,6 @@ build:
 
 run:
 	go run cmd/news-web/main.go
+
+format:
+	go fmt ./...

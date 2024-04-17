@@ -2,6 +2,7 @@ package routes
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -30,8 +31,10 @@ func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 		return c.Render(http.StatusOK, "index.html", d)
 	})
 
-	app.POST("/api/new-article/:key", func(c echo.Context) error {
-		if c.Param("key") == newsKey {
+	app.POST("/api/new-article", func(c echo.Context) error {
+		key := c.Request().Header.Get("Authorization")
+
+		if key == newsKey {
 			a := new(article.Article)
 			if err := c.Bind(a); err != nil {
 				return c.String(http.StatusBadRequest, "bad request")

@@ -72,11 +72,16 @@ func (a *Article) AddToServer(key, serverUrl string) error {
 		return err
 	}
 
-	resp, err := http.Post(
-		serverUrl+"/api/new-article/"+key,
-		"application/json",
-		bytes.NewBuffer(jsonData),
-	)
+	req, err := http.NewRequest("POST", serverUrl+"/api/new-article", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", key)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}

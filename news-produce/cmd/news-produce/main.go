@@ -23,6 +23,7 @@ type Config struct {
 	ImagePath              string
 	CreatePuzzle           bool
 	PuzzlePath             string
+	PostTest               bool
 }
 
 func main() {
@@ -38,6 +39,7 @@ func main() {
 		ImagePath              string
 		CreatePuzzle           bool
 		PuzzlePath             string
+		PostTest               bool
 	)
 
 	ServerKey = os.Getenv("NEWS_KEY")
@@ -53,6 +55,7 @@ func main() {
 	flag.BoolVar(&CreatePuzzle, "puz", false, "Create daily puzzle")
 	flag.StringVar(&PuzzlePath, "puzpath", "", "Path to save puzzle")
 	flag.StringVar(&ServerUrl, "url", "http://localhost:3000", "Server URL")
+	flag.BoolVar(&PostTest, "posttest", false, "Test posting an article to the server.")
 	flag.Parse()
 
 	config := Config{
@@ -65,6 +68,23 @@ func main() {
 		CreateImage:            CreateImage,
 		CreatePuzzle:           CreatePuzzle,
 		PuzzlePath:             PuzzlePath,
+		ImagePath:              ImagePath,
+		PostTest:               PostTest,
+	}
+
+	if config.PostTest {
+		fmt.Printf("Testing posting an article to the server...\n")
+		article := article.Article{
+			Title:   "Test Title",
+			Content: "Test Content",
+			Author:  "Test Author",
+		}
+		err := article.AddToServer(config.ServerKey, config.ServerUrl)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Posted test article to server\n")
+		return
 	}
 
 	fmt.Printf("Generating %d articles using model %s from sources in %s\n", config.NumberOfArticlesTarget, config.ModelName, config.SourcesFile)
