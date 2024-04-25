@@ -9,4 +9,5 @@ type Data struct {
 	Dates      []string
 	Today      string
 	Edition    int
+	Views      int
 }

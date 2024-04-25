@@ -13,6 +13,8 @@ import (
 
 func AddRoutes(app *echo.Echo, data *data.Data, db *sql.DB, newsKey string) {
 	app.GET("/", func(c echo.Context) error {
+		data.Views += 1
+		database.SaveViews(db, data.Today, data.Views)
 		return c.Render(http.StatusOK, "index.html", data)
 	})
 

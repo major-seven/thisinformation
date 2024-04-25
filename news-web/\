@@ -23,7 +23,7 @@ func GetDB(path string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS views (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, views INTEGER)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS viewcounts (articleid INTEGER, count INTEGER, FOREIGN KEY(articleid) REFERENCES articles(id))")
 	if err != nil {
 		return nil, err
 	}
@@ -51,12 +51,6 @@ func GetDataFromDB(db *sql.DB) (*data.Data, error) {
 	d.Dates = dates
 	d.Today = time.Now().Format("2006-01-02")
 	d.Edition = getNumDays(d.Today, startDate) + 1
-
-	views, err := GetViews(db, d.Today)
-	if err != nil {
-		return nil, err
-	}
-	d.Views = views
 
 	return d, nil
 }
@@ -131,51 +125,4 @@ func GetAllDates(db *sql.DB) ([]string, error) {
 	}
 
 	return dates, nil
-}
-
-func GetViews(db *sql.DB, date string) (int, error) {
-	rows, err := db.Query(fmt.Sprintf("SELECT views FROM views WHERE date = '%s'", date))
-	if err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	views := 0
-	if rows.Next() {
-		err = rows.Scan(&views)
-		if err != nil {
-			return 0, err
-		}
-	} else {
-		rows.Close()
-		_, err = db.Exec("INSERT INTO views (date, views) VALUES (?, ?)", date, 0)
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return views, nil
-}
-
-func SaveViews(db *sql.DB, date string, views int) error {
-	rows, err := db.Query(fmt.Sprintf("SELECT views FROM views WHERE date = '%s'", date))
-	if err != nil {
-		return err
-	}
-
-	if rows.Next() {
-		rows.Close()
-		_, err = db.Exec(fmt.Sprintf("UPDATE views SET views = %d WHERE date = '%s'", views, date))
-		if err != nil {
-			return err
-		}
-	} else {
-		rows.Close()
-		_, err = db.Exec("INSERT INTO views (date, views) VALUES (?, ?)", date, views)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
