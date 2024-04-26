@@ -105,6 +105,13 @@ func GetDataByDate(db *sql.DB, date string) (*data.Data, error) {
 	d.Today = date
 	d.Edition = getNumDays(date, startDate) + 1
 
+  views, err := GetViews(db, date)
+  if err != nil {
+    return nil, err
+  }
+
+  d.Views = views
+
 	return &d, nil
 }
 
