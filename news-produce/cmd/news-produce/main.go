@@ -134,17 +134,30 @@ func main() {
 
 	if config.CreateImage {
 		fmt.Printf("Creating image for '%s'...\n", selectedTitles[0])
-		prompt, err := ollama.CreateImagePromptFromTitle(selectedTitles[0])
-		if err != nil {
-			panic(err)
-		}
 
-		if Verbose {
-			fmt.Printf("Prompt: %s\n", prompt)
-		}
+		var url string
+		panicCount := 0
 
-		url, err := dalle.CreateImageForPrompt(prompt)
-		if err != nil {
+		for {
+			prompt, err := ollama.CreateImagePromptFromTitle(selectedTitles[0])
+			if err != nil {
+				panic(err)
+			}
+
+			if Verbose {
+				fmt.Printf("Prompt: %s\n", prompt)
+			}
+
+			url, err = dalle.CreateImageForPrompt(prompt)
+			if err == nil {
+				break
+			}
+
+			if strings.Contains(err.Error(), "content_policy_violation") && panicCount < 4 {
+				panicCount += 1
+				continue
+			}
+
 			panic(err)
 		}
 
